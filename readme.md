@@ -7,7 +7,7 @@ This is basic tool to let you interface with the Cloudflare.com API using Ruby.
 
 ## Dependencies
 
-- [typhoeus]([https://github.com/typhoeus/typhoeus) (for making raw HTTP requests)
+- [typhoeus](https://github.com/typhoeus/typhoeus) (for making raw HTTP requests)
 - [pry](https://github.com/pry/pry) (for basic debugging, feel free to remove from Gemfile and re-bundle)
 
 ## Crash Course
