@@ -10,7 +10,7 @@ class ApiWrapper
   # Cloudflare's documented endpoint. Docs are located at
   # http://www.cloudflare.com/docs/client-api.html
   ENDPOINT = "https://www.cloudflare.com/api_json.html"
-  AUTH     = {tkn: ENV['cloudflare_api_key'], email: ENV['cloudflare_email']}
+  AUTH     = {tkn: ENV['cloudflare_api_key'], email: URI.escape(ENV['cloudflare_email'])}
 
   #
   # ApiWrapper.get("stats", {z: "example.com", interval: 20})
