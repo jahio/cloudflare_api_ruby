@@ -29,7 +29,15 @@ class Zone
     @ttl         = ttl
 
     # Wrap this up in an API request and send to Cloudflare.
-    return result = ApiWrapper.post("rec_new", {z: @zone, type: @record_type,
+    result = ApiWrapper.post("rec_new", {z: @zone, type: @record_type,
       name: @name, content: @content, ttl: @ttl})
+
+    body = JSON.parse(result.body)
+
+    if result.code == 200 && body['result'] && body['result'] == 'success'
+      return true
+    else
+      raise "Api Error: Operation unsuccessful. Response body: \n\n#{body}"
+    end
   end
 end
