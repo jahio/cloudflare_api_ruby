@@ -31,3 +31,5 @@ Dir[File.dirname(__FILE__) + '/lib/*.rb'].each { |f| require f }
 #     STDERR.puts(e)
 #   end
 # end
+
+binding.pry # drop the user into a console if they don't modify this file
