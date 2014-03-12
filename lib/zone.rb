@@ -47,7 +47,7 @@ class Zone
     # First, look to see if the zone already exists.
     zones = zone_entries
     if zones.any? { |x| x['name'].downcase == "#{name}.#{@zone}".downcase }
-      raise ArgumentError, "The zone #{name}.#{@zone} already exists."
+      raise DomainExistsError, "The zone #{name}.#{@zone} already exists."
     end
 
     @record_type = record_type

@@ -1,0 +1,2 @@
+class DomainExistsError < StandardError
+end
