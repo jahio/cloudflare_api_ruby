@@ -3,10 +3,12 @@
 This is basic tool to let you interface with the Cloudflare.com API using Ruby.
 This isn't meant to be a perfectly tested library or anything - it's a quick
 and dirty hack designed to let somebody do some one-off work easily. If you want
-something more "production ready" for bigger/better use cases, instead of a
-scripted interface like this, check out the
+something with a bit more capability than this small script, check out one of
+its dependencies,
 [cloudflare gem](https://github.com/b4k3r/cloudflare) by
-[Marcin Prokop](https://github.com/b4k3r).
+[Marcin Prokop](https://github.com/b4k3r). This is a fuller implementation of
+Cloudflare's API functionality in a Ruby wrapper. This script just provides
+an even easier interface for working with it.
 
 I may or may not improve or maintain this code. It's mostly here for me and a
 client to utilize as needed, but with the hope that somebody finds it useful
