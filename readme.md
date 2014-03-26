@@ -12,13 +12,12 @@ I may or may not improve or maintain this code. It's mostly here for me and a
 client to utilize as needed, but with the hope that somebody finds it useful
 for a one-off project.
 
-## STATUS: DEVELOPMENT
-### Do NOT use for production purposes!
+### STATUS: DEVELOPMENT
+__Do NOT use for production purposes!__
 
 ## Dependencies
-
-- [typhoeus](https://github.com/typhoeus/typhoeus) (for making raw HTTP requests)
-- [pry](https://github.com/pry/pry) (for basic debugging, feel free to remove from Gemfile and re-bundle)
+* [cloudflare](http://rubygems.org/gems/cloudflare)
+* [bundler](http://rubygems.org/gems/bundler)
 
 ## Crash Course
 
@@ -37,7 +36,7 @@ bundle exec ./control.rb # on *nix/Mac OS
 bundle exec ruby control.rb # on Windows...I *think*...
 ```
 
-## Adding a subdomain (example)
+### Adding a subdomain (example)
 
 This will add a subdomain for the given domain that is a CNAME (not an A record)
 to the same location as your actual given root domain, with a default TTL.
@@ -51,7 +50,7 @@ zone.zone_entries.select { |x| x['display_name'] == 'blog' } # show that blog no
 Every time ```add_subdomain``` fires, it runs an ensure block to be certain that
 the zone_entries list is re-populated with the latest data.
 
-## Removing a CNAME record (example)
+### Removing a CNAME (subdomain) record (example)
 
 Say you want to remove a CNAME record from the zone. This is specifically built
 to handle subdomains but could be extended to do more. Here's how you might
