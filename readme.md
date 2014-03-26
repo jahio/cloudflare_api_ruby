@@ -18,6 +18,7 @@ __Do NOT use for production purposes!__
 ## Dependencies
 * [cloudflare](http://rubygems.org/gems/cloudflare)
 * [bundler](http://rubygems.org/gems/bundler)
+* [pry](http://rubygems.org/gems/pry)
 
 ## Crash Course
 
