@@ -1,4 +1,5 @@
-require 'json'
+require 'cloudflare'
+
 #
 # lib/zone.rb
 #
@@ -7,64 +8,74 @@ require 'json'
 #
 
 class Zone
-  attr_accessor :record_type, :destination, :name, :ttl
-  attr_reader   :zone
+  attr_accessor :record_type, :destination, :ttl
+  attr_reader   :zone_name, :cf, :zone_entries
 
-  def initialize(zone)
-    @zone = zone
+  def initialize(zone_name)
+    @zone_name = zone_name
+    @cf = CloudFlare::connection(ENV['cloudflare_api_key'], ENV['cloudflare_email'])
+
+    # Start by populating existing known zone entries
+    populate_zone_entries
   end
 
-  # Retrieves a list of all known entries for the given zone.
-  #
+  # For deleting a CNAME
   # Example:
-  #   foo = Zone.new("example.com")
-  #   entries = foo.zone_entries
+  # z = Zone.new("example.com") # my domain name is example.com
+  # z.delete_cname("foobar") # deletes subdomain foobar.example.com
   #
-  # WARNING: This method does not (yet) go beyond the Cloudflare API
-  # limit of 180 records returned in a result set. You can use the "o"
-  # parameter to give it an offset and start from there (ala pagination)
-  #
-  def zone_entries
-    response = ApiWrapper.get("rec_load_all", {z: @zone})
-    body = JSON.parse(response.body)
-    if response.code == 200 && body['result'] && body['result'] == 'success'
-      return body['response']['recs']['objs'] # body -> records -> objects
-    else
-      raise "Api Error: Operation unsuccessful. Response body: \n\n#{body}"
+  # Where cname is the "displayed name" of the cname you want to get rid of,
+  # WITHOUT the .example.com at the end. So don't pass foobar.example.com, just
+  # pass in "foobar".
+  # Will reload zone entries automatically after finishing.
+  def delete_cname(cname)
+    begin
+      # Start by looking for it. If it doesn't exist, say something about it
+      cname_id = (@zone_entries.select { |x| x['name'] == "#{cname}.#{@zone_name}" }).first['rec_id']
+      res = @cf.rec_delete(@zone_name, cname_id)
+      if res['result'] == 'success' # it worked
+        return true
+      else
+        # API returned something other than success.
+        STDOUT.puts("API request appears to have failed:\n\n#{res}")
+      end
+    rescue => e
+      # Something weird happened, put it out on the screen.
+      STDOUT.puts("Something funky happened.\n\n#{e}")
+    ensure
+      # End by refreshing the zone list.
+      populate_zone_entries
     end
   end
 
-
-  # Creates a given subdomain on a domain.
-  #
-  # Example:
-  #   foo = Zone.new("example.com")
-  #   foo.add_subdomain("CNAME", "foo") # create foo.example.com as a CNAME to example.com
-  #   foo.add_subdomain("A", "bar", "1.2.3.4") # create bar.example.com as an A record to 1.2.3.4
-  #   foo.add_subdomain("A", "baz", "3.4.5.6", 120) # A record for baz.example.com with 120 second TTL
-  #
-  def add_subdomain(record_type, name, content = @zone, ttl = 1)
-    # First, look to see if the zone already exists.
-    zones = zone_entries
-    if zones.any? { |x| x['name'].downcase == "#{name}.#{@zone}".downcase }
-      raise DomainExistsError, "The zone #{name}.#{@zone} already exists."
+  # A very simple method for adding CNAME subdomains. Uses default TTL. Look at
+  # 'rec_new' options for more flexibility.
+  def add_subdomain(subdom)
+    # This just adds a subdomain going directly to the same place as the root
+    # domain that you gave it when you queried CF.
+    begin
+      res = @cf.rec_new(@zone_name, "CNAME", subdom, @zone_name, 1)
+      if res['result'] == 'success'
+        return true
+      else
+        STDOUT.puts("API request appears to have failed:\n\n#{res}")
+      end
+    rescue => e
+      STDOUT.puts("Something funky happened.\n\n#{e}")
+    ensure
+      populate_zone_entries
     end
+  end
 
-    @record_type = record_type
-    @name        = name
-    @content     = content
-    @ttl         = ttl
+private
 
-    # Wrap this up in an API request and send to Cloudflare.
-    result = ApiWrapper.post("rec_new", {z: @zone, type: @record_type,
-      name: @name, content: @content, ttl: @ttl})
-
-    body = JSON.parse(result.body)
-
-    if result.code == 200 && body['result'] && body['result'] == 'success'
-      return true
-    else
-      raise "Api Error: Operation unsuccessful. Response body: \n\n#{body}"
+  # Grabs existing zone entries from Cloudflare and then sets the zone_entries
+  # attribute on this object to equal the results.
+  def populate_zone_entries
+    begin
+      @zone_entries = @cf.rec_load_all(@zone_name)['response']['recs']['objs']
+    rescue => e
+      STDOUT.puts e.message
     end
   end
 end
