@@ -1,6 +1,16 @@
 # cloudflare_api_ruby
 
 This is basic tool to let you interface with the Cloudflare.com API using Ruby.
+This isn't meant to be a perfectly tested library or anything - it's a quick
+and dirty hack designed to let somebody do some one-off work easily. If you want
+something more "production ready" for bigger/better use cases, instead of a
+scripted interface like this, check out the
+[cloudflare gem](https://github.com/b4k3r/cloudflare) by
+[Marcin Prokop](https://github.com/b4k3r).
+
+I may or may not improve or maintain this code. It's mostly here for me and a
+client to utilize as needed, but with the hope that somebody finds it useful
+for a one-off project.
 
 ## STATUS: DEVELOPMENT
 ### Do NOT use for production purposes!
