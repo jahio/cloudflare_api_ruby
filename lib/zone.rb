@@ -48,6 +48,25 @@ class Zone
     end
   end
 
+  # A simple method to add a record.
+  def add_a_record(rec_type = 'A', name, content, ttl=1)
+    begin
+      res = @cf.rec_new(@zone_name, rec_type, name, content, ttl)
+      if res['result'] == 'success' # it worked
+        return true
+      else
+        # API returned something other than success :(
+        STDOUT.puts("API request appears to have failed:\n\n#{res}")
+      end
+    rescue => e
+      # Something weird happened, put it out on the screen.
+      STDOUT.puts("Something funky happened.\n\n#{e}")
+    ensure
+      # End by refreshing the zone list.
+      populate_zone_entries
+    end
+  end
+
   # A very simple method for adding CNAME subdomains. Uses default TTL. Look at
   # 'rec_new' options for more flexibility.
   def add_subdomain(subdom)
