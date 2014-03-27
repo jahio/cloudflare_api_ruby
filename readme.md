@@ -84,6 +84,30 @@ bad_zones.each { |zn| z.delete_cname(zn) } # run the loop
 
 That will nuke all the records that have a name matching 'bad', for example.
 
+### Adding multiple 'A' records
+
+Say you have a bunch of subdomains you want pointing to a different IP address.
+All you'd need to do is grab the list of those subdomains, then use
+```Zone#add_a_record``` to add them inside a loop.
+
+```ruby
+z = Zone.new("example.com")
+list = ['one', 'two', 'three']
+list.each { |x| z.add_a_record('A', x, "1.2.3.4") }
+end
+```
+
+The default value for the first argument is going to be 'A' anyway, so you could
+actually skip that parameter if you wanted. A simpler example of the above might
+be...
+
+```ruby
+z = Zone.new("example.com")
+z.add_a_record('A', "blog", "1.2.3.4")
+```
+
+This would add a "blog" subdomain as an A record that points to the IP 1.2.3.4.
+
 ## If you get SSL warnings/errors...
 
 If you get issues/errors with SSL when trying to use this tool, it's probably
